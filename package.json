@@ -1,0 +1,36 @@
+{
+  "name": "phaser3-typescript-marblerace",
+  "version": "1.0.0",
+  "description": "A marble race game like 'Multiply or Release', using phaser3 with typescript.",
+  "scripts": {
+    "start": "parcel src/index.html -p 8000",
+    "build": "parcel build src/index.html --out-dir dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "phaser3",
+    "typescript"
+  ],
+  "author": "ryan4g",
+  "license": "MIT",
+  "repository": {
+		"type": "git",
+		"url": "https://github.com/Ryan4G/phaser3-typescript-marblerace.git"
+	},
+  "dependencies": {
+    "phaser": "^3.55.2"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.5",
+    "parcel-plugin-clean-easy": "^1.0.2",
+    "parcel-plugin-static-files-copy": "^2.6.0",
+    "typescript": "^4.4.2"
+  },
+	"parcelCleanPaths": [
+		"dist"
+	],
+	"staticFiles": {
+		"staticPath": "public",
+		"watcherGlob": "**"
+	}
+}
