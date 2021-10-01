@@ -10,9 +10,11 @@ import { Fort } from '~sprites/Fort';
 export default class GameScene extends Phaser.Scene {
 
     private bullets?: Phaser.GameObjects.Group;
+    private _forts: Array<Fort>;
 
     constructor() {
         super('GameScene');
+        this._forts = [];
     }
 
     init(){
@@ -21,7 +23,7 @@ export default class GameScene extends Phaser.Scene {
     create()
     {
         this.cameras.main.setBounds(
-            - raceConfig.BlockW * raceConfig.RaceMapCols, - raceConfig.BlockW * raceConfig.RaceMapCols * 0.5,
+            - raceConfig.BlockW * raceConfig.RaceMapCols, - raceConfig.BlockW * raceConfig.RaceMapCols * 0.25,
             this.scale.width, this.scale.height);
 
         this.scene.launch('TriggerScene');
@@ -63,21 +65,21 @@ export default class GameScene extends Phaser.Scene {
             }
         });
 
-        let blueFort = forts.get(raceConfig.BlockW * 2, raceConfig.BlockH * 2) as Fort;
-        blueFort.makeColor(MarbleColors.Blue);
-        blueFort.makeDirection(Directions.LeftDown);
+        this._forts[MarbleColors.Blue] = forts.get(raceConfig.BlockW * 2, raceConfig.BlockH * 2) as Fort;
+        this._forts[MarbleColors.Blue].makeColor(MarbleColors.Blue);
+        this._forts[MarbleColors.Blue].makeDirection(Directions.LeftDown);
 
-        let redFort = forts.get((raceConfig.RaceMapCols - 2) * raceConfig.BlockW, raceConfig.BlockH * 2) as Fort;
-        redFort.makeColor(MarbleColors.Red);
-        redFort.makeDirection(Directions.RightDown);
+        this._forts[MarbleColors.Red] = forts.get((raceConfig.RaceMapCols - 2) * raceConfig.BlockW, raceConfig.BlockH * 2) as Fort;
+        this._forts[MarbleColors.Red].makeColor(MarbleColors.Red);
+        this._forts[MarbleColors.Red].makeDirection(Directions.RightDown);
         
-        let limeFort = forts.get(raceConfig.BlockW * 2, (raceConfig.RaceMapRows - 2) * raceConfig.BlockH) as Fort;
-        limeFort.makeColor(MarbleColors.Lime);
-        limeFort.makeDirection(Directions.LeftUp);
+        this._forts[MarbleColors.Lime] = forts.get(raceConfig.BlockW * 2, (raceConfig.RaceMapRows - 2) * raceConfig.BlockH) as Fort;
+        this._forts[MarbleColors.Lime].makeColor(MarbleColors.Lime);
+        this._forts[MarbleColors.Lime].makeDirection(Directions.LeftUp);
         
-        let yellowFort = forts.get((raceConfig.RaceMapCols - 2) * raceConfig.BlockW, (raceConfig.RaceMapRows - 2) * raceConfig.BlockH) as Fort;
-        yellowFort.makeColor(MarbleColors.Yellow);
-        yellowFort.makeDirection(Directions.RightUp);
+        this._forts[MarbleColors.Yellow] = forts.get((raceConfig.RaceMapCols - 2) * raceConfig.BlockW, (raceConfig.RaceMapRows - 2) * raceConfig.BlockH) as Fort;
+        this._forts[MarbleColors.Yellow].makeColor(MarbleColors.Yellow);
+        this._forts[MarbleColors.Yellow].makeDirection(Directions.RightUp);
 
         // create bullets
         this.bullets = this.add.group({
@@ -102,20 +104,23 @@ export default class GameScene extends Phaser.Scene {
             }
         }, undefined, this);
 
-        this.physics.add.overlap(this.bullets, forts, (obj1, obj2) => {
+        this.physics.add.overlap(this.bullets, this._forts, (obj1, obj2) => {
 
             let bullet = obj1 as Bullet;
             let fort = obj2 as Fort;
 
-            if (bullet.color !== fort.color){
-                bullet.destroy();
-                fort.destroy();
-
+            if (bullet.color !== fort.color && fort.active){
+                fort.setActive(false);
+                
                 // emit events to trigger scene stop rolling
                 sceneEvents.emit(
                     EVENT_FORT_DESTORY,
                     fort.color
                 );
+
+                bullet.destroy();
+
+                fort.defeated();
             }
         }, undefined, this);
 
@@ -123,22 +128,31 @@ export default class GameScene extends Phaser.Scene {
             EVENT_FORT_FIRE,
             (color: MarbleColors, count: number) => {
                 console.log(`${MarbleColors[color]} fire ${count}`);
+
+                let remainCount = count - 1;
+
+                if (!this._forts[color] || !this._forts[color].active){
+                    return;
+                }
                 
-                let fort:Fort = redFort;
-                this.tweens.addCounter({
-                    from: count,
-                    to: 0,
-                    duration: count * 100,
-                    onUpdate: () => {
-                        fort.fire(this.bullets!);
-                    },
-                    onComplete:  () => {
-                        sceneEvents.emit(
-                            EVENT_FORT_FIREOFF,
-                            color
-                        );
+                this.time.addEvent({
+                    delay: 100,
+                    repeat: count - 1,
+                    callback: (args: any[]) => {
+
+                        if (this._forts[color] && this._forts[color].active){
+                            this._forts[color].fire(this.bullets!);
+                            
+                            if (remainCount <= 0){
+                                sceneEvents.emit(
+                                    EVENT_FORT_FIREOFF,
+                                    color
+                                );
+                            }
+                            remainCount--;
+                        }
                     }
-                })
+                });
             }
         );
     }

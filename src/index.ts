@@ -9,8 +9,9 @@ const config: Phaser.Types.Core.GameConfig = {
 		parent: '#phaser-main',
 		mode: Phaser.Scale.FIT,
 		width: 720,
-		height: 420
+		height: 420,
 	},
+	canvasStyle: 'width:100%;height:100%',
 	width: 720,
 	height: 420,
     backgroundColor: '#7d7d7d',

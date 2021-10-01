@@ -86,7 +86,7 @@ export class Fort extends Phaser.GameObjects.Container{
 
                 this._tween = this.scene.tweens.addCounter({
                     from: 100,
-                    to: 10,
+                    to: -10,
                     duration: 3000,
                     repeat: -1,
                     yoyo: true,
@@ -157,5 +157,11 @@ export class Fort extends Phaser.GameObjects.Container{
 
         //bullet.physicsBody.setBounce(1, 1);
         //bullet.physicsBody.setCollideWorldBounds(true);
+    }
+
+    defeated(){
+        this.setVisible(false);
+        this.setActive(false);
+        this._tween.stop();
     }
 }
