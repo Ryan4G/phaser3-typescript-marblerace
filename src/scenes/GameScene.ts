@@ -1,20 +1,23 @@
 import Phaser from 'phaser';
-import { raceConfig } from '~configs/GameConfig';
-import { MarbleColors } from '~enums/Colors';
-import { Directions } from '~enums/Directions';
-import { EVENT_FORT_DESTORY, EVENT_FORT_FIRE, EVENT_FORT_FIREOFF, sceneEvents } from '~events/GameEvents';
-import { Block } from '~sprites/Block';
-import { Bullet } from '~sprites/Bullet';
-import { Fort } from '~sprites/Fort';
+import { raceConfig } from '../configs/GameConfig';
+import { MarbleColors } from '../enums/Colors';
+import { Directions } from '../enums/Directions';
+import { EVENT_FORT_DESTORY, EVENT_FORT_FIRE, EVENT_FORT_FIREOFF, sceneEvents } from '../events/GameEvents';
+import { Block } from '../sprites/Block';
+import { Bullet } from '../sprites/Bullet';
+import { Fort } from '../sprites/Fort';
 
 export default class GameScene extends Phaser.Scene {
 
     private bullets?: Phaser.GameObjects.Group;
     private _forts: Array<Fort>;
+    private _titleText?: Phaser.GameObjects.Text;
+    private _gameTime: Date;
 
     constructor() {
         super('GameScene');
         this._forts = [];
+        this._gameTime = new Date();
     }
 
     init(){
@@ -22,8 +25,10 @@ export default class GameScene extends Phaser.Scene {
 
     create()
     {
+        // adjust the cameras to show game scene
         this.cameras.main.setBounds(
-            - raceConfig.BlockW * raceConfig.RaceMapCols, - raceConfig.BlockW * raceConfig.RaceMapCols * 0.25,
+            - raceConfig.BlockW * raceConfig.RaceMapCols * 0.5 - raceConfig.MarbleRadius * 2, 
+            - raceConfig.MarbleRadius * 2 - raceConfig.BlankH,
             this.scale.width, this.scale.height);
 
         this.scene.launch('TriggerScene');
@@ -121,13 +126,29 @@ export default class GameScene extends Phaser.Scene {
                 bullet.destroy();
 
                 fort.defeated();
+
+                if (this.checkGameOver()){
+                    let winnerColor = this.getGameWinner();
+
+                    if (winnerColor !== -1){
+                        this._titleText?.setText(
+                            `        --- Marble Race ---\n--- THE WINNER IS ${MarbleColors[winnerColor].toUpperCase()}! ---`,
+                        );
+
+                        this._titleText?.setColor(`#${raceConfig.fortColors[winnerColor].toString(16).toLowerCase()}`);
+
+                        let elapsedMinutes = Math.floor((new Date().getTime() - this._gameTime.getTime()) / 1000 / 24 / 60);
+                        console.log(`Game Over! ${MarbleColors[winnerColor]} won the game! It's cost ${elapsedMinutes} mintues.`)
+                        this.scene.pause();
+                    }
+                }
             }
         }, undefined, this);
 
         sceneEvents.on(
             EVENT_FORT_FIRE,
             (color: MarbleColors, count: number) => {
-                console.log(`${MarbleColors[color]} fire ${count}`);
+                //console.log(`${MarbleColors[color]} fire ${count}`);
 
                 let remainCount = count - 1;
 
@@ -136,7 +157,7 @@ export default class GameScene extends Phaser.Scene {
                 }
                 
                 this.time.addEvent({
-                    delay: 100,
+                    delay: raceConfig.fireDelay,
                     repeat: count - 1,
                     callback: (args: any[]) => {
 
@@ -155,10 +176,82 @@ export default class GameScene extends Phaser.Scene {
                 });
             }
         );
+
+        const graphic = this.add.graphics(
+            {
+                lineStyle:{
+                    width: raceConfig.MarbleRadius * 2,
+                    color: 0x333333,
+                },
+                fillStyle:{
+                    color: 0x000000
+                }
+            }
+        );
+
+        graphic.strokeRect(
+            -raceConfig.MarbleRadius, -raceConfig.MarbleRadius, 
+            raceConfig.BlockW * raceConfig.RaceMapCols + raceConfig.MarbleRadius * 2,
+            raceConfig.BlockH * raceConfig.RaceMapRows + raceConfig.MarbleRadius * 2
+        );
+
+        const titleGraphic = this.add.graphics(
+            {
+                lineStyle: {
+                    color: 0x333333,
+                    width: raceConfig.MarbleRadius
+                }
+            }
+        );
+
+        const titleRect = new Phaser.Geom.Rectangle(
+            - raceConfig.BlockW * raceConfig.RaceMapCols * 0.5 - raceConfig.MarbleRadius * 1.5, 
+            - raceConfig.MarbleRadius * 1.5 - raceConfig.BlankH,
+            this.scale.width - raceConfig.MarbleRadius,
+            raceConfig.BlankH - raceConfig.MarbleRadius
+        );
+
+        titleGraphic.strokeRectShape(titleRect);
+
+        this._titleText = this.add.text(
+            titleRect.x + titleRect.width * 0.5,
+            titleRect.y + titleRect.height * 0.5,
+            '    --- Marble Race ---\n--- Which one will win? ---',
+            {
+                fontFamily: 'Arial Calibri',
+                fontSize: '2em',
+                color: '#ffffff',
+                fontStyle: 'bolder',
+            }
+        ).setOrigin(0.5);
     }
 
     update() {
         
     }
 
+    checkGameOver():boolean{
+        let liveCount: number = 0;
+        let i = 0;
+
+        while(i < this._forts.length){
+            liveCount += (this._forts[i].active && this._forts[i].visible) ? 1 : 0;
+            i++;
+        }
+        
+        return liveCount <= 1;
+    }
+
+    getGameWinner(): number{
+        let i = 0;
+
+        while(i < this._forts.length){
+            if(this._forts[i].active && this._forts[i].visible){
+                return i;
+            }
+            i++;
+        }
+
+        return -1;
+    }
 }

@@ -1,11 +1,24 @@
 const raceConfig = {
-    RaceMapCols: 30,
-    RaceMapRows: 30,
+    RaceMapCols: 38,
+    RaceMapRows: 38,
     BulletW: 8,
     BulletH: 8,
     BlockW: 8,
     BlockH: 8,
     MarbleRadius: 8,
+    BlankH: 64,
+    fireDelay: 80,
+    // blue, red, lime, yellow
+    fortColors: [0x1C1AFF, 0xFF1A1B, 0x10FF15, 0xFEFF1A],
+    // blue, red, lime, yellow
+    bulletColors: [0x1C1AFF, 0xFF1A1B, 0x10FF15, 0xFEFF1A],
+    // blue, red, lime, yellow
+    blockColors: [0x010074, 0x820002, 0x005200, 0x727010],
+    // blue, red, lime, yellow, grey
+    marbleColors: [0x1C1AFF, 0xFF1A1B, 0x10FF15, 0xFEFF1A, 0x343334],
+    releaseRectColors: 0xFF0080,
+    multiplyRectColors: 0x80ff00,
+    disableRectColors: 0X3F3F3F,
 };
 
 export {

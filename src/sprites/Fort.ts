@@ -1,6 +1,6 @@
-import { raceConfig } from "~configs/GameConfig";
-import { MarbleColors } from "~enums/Colors";
-import { Directions } from "~enums/Directions";
+import { raceConfig } from "../configs/GameConfig";
+import { MarbleColors } from "../enums/Colors";
+import { Directions } from "../enums/Directions";
 import { Bullet } from "./Bullet";
 
 export class Fort extends Phaser.GameObjects.Container{
@@ -32,7 +32,7 @@ export class Fort extends Phaser.GameObjects.Container{
         this._tween = scene.tweens.addCounter({
             from: -10,
             to: 100,
-            duration: 3000,
+            duration: 2000,
             repeat: -1,
             yoyo: true,
             onUpdate: (tween) => 
@@ -54,23 +54,8 @@ export class Fort extends Phaser.GameObjects.Container{
     makeColor(color: MarbleColors){
         let bodyColor = 0xffffff;
         
-        switch(color){
-            case MarbleColors.Blue:{
-                bodyColor = 0x1C1AFF;
-                break;
-            }
-            case MarbleColors.Red:{
-                bodyColor = 0xFF1A1B;
-                break;
-            }
-            case MarbleColors.Lime:{
-                bodyColor = 0x10FF15;
-                break;
-            }
-            case MarbleColors.Yellow:{
-                bodyColor = 0xFEFF1A;
-                break;
-            }
+        if (color !== MarbleColors.Grey){
+            bodyColor = raceConfig.fortColors[color];
         }
 
         this._circleBody.fillColor = bodyColor;

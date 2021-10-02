@@ -1,5 +1,5 @@
-import { raceConfig } from "~configs/GameConfig";
-import { MarbleColors } from "~enums/Colors";
+import { raceConfig } from "../configs/GameConfig";
+import { MarbleColors } from "../enums/Colors";
 
 export class Block extends Phaser.GameObjects.Container{
 
@@ -35,25 +35,10 @@ export class Block extends Phaser.GameObjects.Container{
     makeColor(color: MarbleColors){
         let bodyColor = 0xffffff;
 
-        switch(color){
-            case MarbleColors.Blue:{
-                bodyColor = 0x010074;
-                break;
-            }
-            case MarbleColors.Red:{
-                bodyColor = 0x820002;
-                break;
-            }
-            case MarbleColors.Lime:{
-                bodyColor = 0x005200;
-                break;
-            }
-            case MarbleColors.Yellow:{
-                bodyColor = 0x727010;
-                break;
-            }
+        if (color !== MarbleColors.Grey){
+            bodyColor = raceConfig.blockColors[color];
         }
-
+        
         this._rectBody.fillColor = bodyColor;
         this._color = color;
     }

@@ -1,5 +1,5 @@
-import { raceConfig } from "~configs/GameConfig";
-import { MarbleColors } from "~enums/Colors";
+import { raceConfig } from "../configs/GameConfig";
+import { MarbleColors } from "../enums/Colors";
 
 export class Marble extends Phaser.GameObjects.Container{
 
@@ -35,30 +35,36 @@ export class Marble extends Phaser.GameObjects.Container{
     makeColor(color: MarbleColors){
         let bodyColor = 0xffffff;
         
-        switch(color){
-            case MarbleColors.Blue:{
-                bodyColor = 0x1C1AFF;
-                break;
-            }
-            case MarbleColors.Red:{
-                bodyColor = 0xFF1A1B;
-                break;
-            }
-            case MarbleColors.Lime:{
-                bodyColor = 0x10FF15;
-                break;
-            }
-            case MarbleColors.Yellow:{
-                bodyColor = 0xFEFF1A;
-                break;
-            }
-            case MarbleColors.Grey:{
-                bodyColor = 0x343334;
-                break;
-            }
-        }
+        bodyColor = raceConfig.marbleColors[color];
 
         this._circleBody.fillColor = bodyColor;
         this._color = color;
+    }
+
+    makeEntranceAnims(){
+        this._circleBody.setScale(5);
+        this._circleBody.setAlpha(0);
+        let tmpV = new Phaser.Math.Vector2(this.physicsBody.velocity.x, this.physicsBody.velocity.y);
+        let tmpG = new Phaser.Math.Vector2(this.physicsBody.gravity.x, this.physicsBody.gravity.y);
+        
+        this.scene.add.tween(
+            {
+                targets: this._circleBody,
+                scale: 1,
+                alpha: 1,
+                ease: 'Sine.easeInOut',
+                duration: 1000,
+                onStart: () =>{
+                    this.physicsBody.stop();
+                    this.physicsBody.setGravity(0 ,0);
+                    this.physicsBody.setImmovable(true);
+                },
+                onComplete: ()=>{
+                    this.physicsBody.setImmovable(false);
+                    this.physicsBody.setVelocity(tmpV.x ,tmpV.y);
+                    this.physicsBody.setGravity(tmpG.x ,tmpG.y);
+                }
+            }
+        )
     }
 }

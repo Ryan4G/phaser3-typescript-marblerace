@@ -1,13 +1,11 @@
-import { raceConfig } from "~configs/GameConfig";
-import { MarbleColors } from "~enums/Colors";
-import { IPoint } from "~interfaces/IPoint";
+import { raceConfig } from "../configs/GameConfig";
+import { MarbleColors } from "../enums/Colors";
 
 export class Bullet extends Phaser.GameObjects.Container{
 
     private _circleBody: Phaser.GameObjects.Arc;
     private _color?: MarbleColors;
-    // private _graphic: Phaser.GameObjects.Graphics;
-    // private _points: Array<IPoint>;
+    private _lifeSpan?: number;
     /**
      * 
      * @param scene The Scene to which this Game Object belongs. A Game Object can only belong to one Scene at a time.
@@ -31,8 +29,8 @@ export class Bullet extends Phaser.GameObjects.Container{
 
         this.add(this._circleBody);
 
-        // this._graphic = scene.add.graphics();
-        // this._points = [];
+        // live time last 10 seconds
+        this._lifeSpan = 10000;
     }
 
     get physicsBody(){
@@ -44,56 +42,20 @@ export class Bullet extends Phaser.GameObjects.Container{
     }
     
     update(time: number, delta: number){
+        this._lifeSpan! -= delta;
 
-        // this._points.push(
-        //     {
-        //         x: this.x, y: this.y, time: 10
-        //     }
-        // );
-
-        // this._graphic.clear();
-
-        // if (this._points.length > 4){
-        //     let count = this._points.length - 4;
-
-        //     for(let i = count; i > 0; i--){
-        //         this._graphic.fillStyle(0x1C1AFF, i / count);
-        //         this._graphic.fillCircle(this._points[i].x, this._points[i].y, raceConfig.BulletW * 0.5);
-        //     }
-        // }
-
-        // for(let i = 0; i < this._points.length; i++){
-        //     this._points[i].time -= 0.5;
-
-        //     if (this._points[i].time < 0){
-        //         this._points.splice(0, 1);
-        //         i--;
-        //     }
-        // }
-    }
+        if (this._lifeSpan! <= 0){
+            this.destroy();
+        }
+    };
 
     makeColor(color: MarbleColors){
         let bodyColor = 0xffffff;
 
-        switch(color){
-            case MarbleColors.Blue:{
-                bodyColor = 0x1C1AFF;
-                break;
-            }
-            case MarbleColors.Red:{
-                bodyColor = 0xFF1A1B;
-                break;
-            }
-            case MarbleColors.Lime:{
-                bodyColor = 0x10FF15;
-                break;
-            }
-            case MarbleColors.Yellow:{
-                bodyColor = 0xFEFF1A;
-                break;
-            }
+        if (color !== MarbleColors.Grey){
+            bodyColor = raceConfig.bulletColors[color];
         }
-
+        
         this._circleBody.fillColor = bodyColor;
         this._color = color;
     }
