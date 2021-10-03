@@ -143,7 +143,7 @@ export default class GameScene extends Phaser.Scene {
 
                         this._titleText?.setColor(`#${raceConfig.fortColors[winnerColor].toString(16).toLowerCase()}`);
 
-                        let elapsedMinutes = Math.floor((new Date().getTime() - this._gameTime.getTime()) / 1000 / 24 / 60);
+                        let elapsedMinutes = Math.floor((new Date().getTime() - this._gameTime.getTime()) / 1000 / 60);
                         console.log(`Game Over! ${MarbleColors[winnerColor]} won the game! It's cost ${elapsedMinutes} mintues.`)
                         this.scene.pause();
                     }
