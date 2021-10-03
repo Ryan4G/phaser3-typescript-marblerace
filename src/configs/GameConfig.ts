@@ -1,11 +1,11 @@
 const raceConfig = {
-    RaceMapCols: 38,
-    RaceMapRows: 38,
-    BulletW: 8,
-    BulletH: 8,
-    BlockW: 8,
-    BlockH: 8,
-    MarbleRadius: 8,
+    RaceMapCols: 36,
+    RaceMapRows: 36,
+    BulletW: 10,
+    BulletH: 10,
+    BlockW: 10,
+    BlockH: 10,
+    MarbleRadius: 10,
     BlankH: 64,
     fireDelay: 80,
     // blue, red, lime, yellow

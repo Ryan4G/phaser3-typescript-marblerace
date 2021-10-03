@@ -32,12 +32,18 @@ export default class TriggerScene extends Phaser.Scene {
     }
 
     create()
-    {
+    {        
+        const camera = this.cameras.main;
+        camera.centerOn(
+            raceConfig.BlockW * raceConfig.RaceMapCols * 0.5, 
+            (raceConfig.BlockW * raceConfig.RaceMapCols + raceConfig.BlankH) * 0.5
+        );
+
         // adjust the cameras to show game scene
-        this.cameras.main.setBounds(
-            - raceConfig.BlockW * raceConfig.RaceMapCols * 0.5 - raceConfig.MarbleRadius * 2, 
-            - raceConfig.MarbleRadius * 2 - raceConfig.BlankH,
-            this.scale.width, this.scale.height);
+        // this.cameras.main.setBounds(
+        //     - raceConfig.BlockW * raceConfig.RaceMapCols * 0.5 - raceConfig.MarbleRadius * 2, 
+        //     - raceConfig.MarbleRadius * 2 - raceConfig.BlankH,
+        //     this.scale.width, this.scale.height);
 
         const graphic = this.add.graphics(
             {
@@ -311,7 +317,7 @@ export default class TriggerScene extends Phaser.Scene {
         // per minutes add a new marble (if trigger is still avaliable)
         this.time.addEvent(
             {
-                delay: 5000,
+                delay: 30000,
                 callback: () => {
                     this._ratioChangeTimes++;
 
@@ -352,6 +358,30 @@ export default class TriggerScene extends Phaser.Scene {
             }
         );
 
+        // fill up the bottom wrap border
+        let noticeRect = new Phaser.Geom.Rectangle(
+            this._triggerRectArray[MarbleColors.Lime].x - raceConfig.MarbleRadius * 0.5,
+            this._triggerRectArray[MarbleColors.Lime].y + this._triggerRectArray[MarbleColors.Lime].width + raceConfig.MarbleRadius,
+            this._triggerRectArray[MarbleColors.Lime].width * 4 + raceConfig.MarbleRadius * 3,
+            raceConfig.BlankH * 1.5,
+        );
+
+        graphic.strokeRectShape(noticeRect);
+
+        let noticeBody = '';
+        noticeBody += 'GameNotice:\n1. A new marble trigger will be added when 30 seconds elapsed, and maximum is 6.\n';
+        noticeBody += '2. The bullet\'s life span was setting to 10 seconds, it will destory when the life times up.\n';
+        noticeBody += '3. The MAX bullet\'s quantity is 512 when the fort fired each time.';
+
+        const noticeText = this.add.text(
+            noticeRect.x + raceConfig.MarbleRadius,
+            noticeRect.y + raceConfig.MarbleRadius * 1.25,
+            noticeBody,
+            {
+                fontFamily: 'Arial Calibri',
+                color: '#ffffff'
+            }
+        )
     }
 
     update(time: number, delta: number) {

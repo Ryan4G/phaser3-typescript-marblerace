@@ -5,6 +5,10 @@ import PreloadScene from './scenes/PreloadScene'
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
+	scale:{
+		mode: Phaser.Scale.RESIZE,
+        parent: 'phaser-main',
+	},
 	width: 640,
 	height: 400,
     backgroundColor: '#7d7d7d',

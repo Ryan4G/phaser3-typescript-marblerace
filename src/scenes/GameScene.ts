@@ -25,11 +25,17 @@ export default class GameScene extends Phaser.Scene {
 
     create()
     {
+        const camera = this.cameras.main;
+        camera.centerOn(
+            raceConfig.BlockW * raceConfig.RaceMapCols * 0.5, 
+            (raceConfig.BlockW * raceConfig.RaceMapCols + raceConfig.BlankH) * 0.5
+        );
+
         // adjust the cameras to show game scene
-        this.cameras.main.setBounds(
-            - raceConfig.BlockW * raceConfig.RaceMapCols * 0.5 - raceConfig.MarbleRadius * 2, 
-            - raceConfig.MarbleRadius * 2 - raceConfig.BlankH,
-            this.scale.width, this.scale.height);
+        // this.cameras.main.setBounds(
+        //     - raceConfig.BlockW * raceConfig.RaceMapCols * 0.5 - raceConfig.MarbleRadius * 2, 
+        //     - raceConfig.MarbleRadius * 2 - raceConfig.BlankH,
+        //     this.scale.width, this.scale.height);
 
         this.scene.launch('TriggerScene');
 
@@ -207,7 +213,7 @@ export default class GameScene extends Phaser.Scene {
         const titleRect = new Phaser.Geom.Rectangle(
             - raceConfig.BlockW * raceConfig.RaceMapCols * 0.5 - raceConfig.MarbleRadius * 1.5, 
             - raceConfig.MarbleRadius * 1.5 - raceConfig.BlankH,
-            this.scale.width - raceConfig.MarbleRadius,
+            raceConfig.BlockW * raceConfig.RaceMapCols * 2 + raceConfig.MarbleRadius * 3,
             raceConfig.BlankH - raceConfig.MarbleRadius
         );
 
